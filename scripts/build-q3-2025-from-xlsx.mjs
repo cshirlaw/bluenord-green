@@ -1,154 +1,80 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
+// scripts/build-q3-2025-from-xlsx.mjs
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import xlsx from 'xlsx';
-import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, '..');
 
-const INPUT = path.join(__dirname, '../data/input/q3-2025.xlsx');
-const OUT = path.join(__dirname, '../public/data/briefings/q3-2025.blocks.json');
+const INPUT_XLSX = path.join(ROOT, 'data', 'input', 'q3-2025.xlsx');
+const OUT_DIR = path.join(ROOT, 'public', 'data', 'financials');
+const OUT_JSON = path.join(OUT_DIR, 'q3-2025.json');
 
-function sheetJSON(wb, name) {
+function ensureDir(p) {
+  fs.mkdirSync(p, { recursive: true });
+}
+
+function readSheet(wb, name, required = []) {
   const sh = wb.Sheets[name];
   if (!sh) return [];
-  return xlsx.utils.sheet_to_json(sh, { defval: '' });
-}
-function num(x) {
-  const n = Number(x);
-  return Number.isFinite(n) ? n : 0;
+  const rows = xlsx.utils.sheet_to_json(sh, { defval: null, raw: true, blankrows: false });
+  if (!rows.length) return [];
+  for (const col of required) {
+    if (!Object.prototype.hasOwnProperty.call(rows[0], col)) {
+      console.warn(`Warning: Sheet "${name}" missing column "${col}". Got: ${Object.keys(rows[0]).join(', ')}`);
+      break;
+    }
+  }
+  return rows;
 }
 
-async function main() {
-  try { await fs.access(INPUT); } catch {
-    console.warn(`⚠️  Skipping Q3 build: XLSX not found at ${INPUT}`);
-    process.exit(0);
+function main() {
+  if (!fs.existsSync(INPUT_XLSX)) {
+    console.log(`Q3 builder: input file not found, skipping: ${INPUT_XLSX}`);
+    return;
   }
 
-  const buf = await fs.readFile(INPUT);
-  const wb = xlsx.read(buf, { type: 'buffer' });
+  const wb = xlsx.readFile(INPUT_XLSX);
 
-  const kpis = sheetJSON(wb, 'kpis');
-  const production = sheetJSON(wb, 'production');
-  const hedgeKPIs = sheetJSON(wb, 'hedge_kpis');
-  const oilRows = sheetJSON(wb, 'oil');
-  const gasRows = sheetJSON(wb, 'gas');
-  const metaRows = sheetJSON(wb, 'hedge_meta');
-  const totalsRows = sheetJSON(wb, 'totals');
-  const avgRows = sheetJSON(wb, 'avgPrices');
-  const footnotesRows = sheetJSON(wb, 'footnotes');
-  const sourceRows = sheetJSON(wb, 'source');
+  // Sheets: Hero(title, subtitle), Production(month, avg, peak),
+  // GasHedge(label, hedgedVolume, floorPrice), OilHedge(label, hedgedVolume, floorPrice)
+  const heroRows = readSheet(wb, 'Hero', ['title']);
+  const productionRows = readSheet(wb, 'Production', ['month', 'avg', 'peak']);
+  const gasRows = readSheet(wb, 'GasHedge', ['label', 'hedgedVolume', 'floorPrice']);
+  const oilRows = readSheet(wb, 'OilHedge', ['label', 'hedgedVolume', 'floorPrice']);
 
-  const meta = metaRows[0] || {};
-
-  const doc = {
-    slides: [
-      {
-        id: 'hero',
-        title: 'BlueNord — Q3 2025 presentation (interactive)',
-        blocks: [
-          {
-            type: 'hero',
-            image: '/images/briefings/q3-2025/hero.png',
-            logo: '/images/brand/bluenord-logo-260925.png',
-            title: 'Q3 2025 — Highlights & details',
-            subtitle: 'Interactive view of selected slides. Updated from spreadsheet on each deploy.'
-          }
-        ]
-      },
-      {
-        id: 'highlights',
-        title: 'Quarter highlights',
-        blocks: [
-          {
-            type: 'chartsRow',
-            cols: 3,
-            items: kpis.filter(r => r.label).map(r => ({
-              kind: 'kpi',
-              label: String(r.label),
-              value: String(r.value),
-              unit: r.unit ? String(r.unit) : undefined,
-              hint: r.hint ? String(r.hint) : undefined,
-            })),
-          }
-        ]
-      },
-      {
-        id: 'production',
-        title: 'Production — Average vs Peak',
-        blocks: [
-          {
-            type: 'barLine',
-            title: 'Monthly production (Q3 2025)',
-            yLeftUnit: 'mboe/d',
-            series: production.filter(r => r.label).map(r => ({
-              label: String(r.label),
-              avg: num(r.avg),
-              peak: num(r.peak),
-            })),
-          }
-        ]
-      },
-      {
-        id: 'hedging',
-        title: 'Hedge portfolio (snapshot)',
-        blocks: [
-          {
-            type: 'hedgeTabs',
-            kpis: hedgeKPIs.filter(r => r.label).map(r => ({ label: String(r.label), value: String(r.value) })),
-            oil: {
-              unitVolume: String(meta.oil_unitVolume || 'mmbbl'),
-              unitPrice: String(meta.oil_unitPrice || '$/bbl'),
-              rows: oilRows.filter(r => r.period).map(r => ({
-                period: String(r.period), volume: num(r.volume), price: num(r.price)
-              })),
-              totals: totalsRows.filter(r => String(r.stream).toLowerCase() === 'oil' && r.label)
-                .map(r => ({ label: String(r.label), value: num(r.value), unit: String(r.unit || '') })),
-              avgPrices: avgRows.filter(r => String(r.stream).toLowerCase() === 'oil' && r.label)
-                .map(r => ({ label: String(r.label), value: num(r.value), unit: String(meta.oil_unitPrice || '$/bbl') })),
-              spot: num(meta.spot_oil),
-            },
-            gas: {
-              unitVolume: String(meta.gas_unitVolume || 'GWh'),
-              unitPrice: String(meta.gas_unitPrice || '€/MWh'),
-              rows: gasRows.filter(r => r.period).map(r => ({
-                period: String(r.period), volume: num(r.volume), price: num(r.price)
-              })),
-              totals: totalsRows.filter(r => String(r.stream).toLowerCase() === 'gas' && r.label)
-                .map(r => ({ label: String(r.label), value: num(r.value), unit: String(r.unit || '') })),
-              avgPrices: avgRows.filter(r => String(r.stream).toLowerCase() === 'gas' && r.label)
-                .map(r => ({ label: String(r.label), value: num(r.value), unit: String(meta.gas_unitPrice || '€/MWh') })),
-              spot: num(meta.spot_gas),
-            },
-            disclaimer: ['Numbers loaded from spreadsheet.'],
-          }
-        ]
-      },
-      {
-        id: 'notes',
-        title: 'Notes & sources',
-        blocks: [
-          {
-            type: 'footnotes',
-            items: footnotesRows.filter(r => r.text).map(r => String(r.text)),
-            source: {
-              pdf: String((sourceRows[0]?.pdf) || ''),
-              pageHint: String((sourceRows[0]?.pageHint) || ''),
-            },
-            updateCadence: String((sourceRows[0]?.updateCadence) || 'quarterly'),
-          }
-        ]
-      }
-    ]
+  const hero = {
+    title: heroRows[0]?.title ?? 'Q3 2025 presentation (interactive)',
+    subtitle: heroRows[0]?.subtitle ?? '',
   };
 
-  await fs.mkdir(path.dirname(OUT), { recursive: true });
-  await fs.writeFile(OUT, JSON.stringify(doc, null, 2));
-  console.log(`✅ Q3: wrote ${OUT}`);
+  const production = productionRows
+    .filter(r => r.month != null)
+    .map(r => ({ month: String(r.month), avg: Number(r.avg ?? 0), peak: Number(r.peak ?? 0) }));
+
+  const gasHedge = gasRows
+    .filter(r => r.label != null)
+    .map(r => ({
+      label: String(r.label),
+      hedgedVolume: r.hedgedVolume != null ? Number(r.hedgedVolume) : undefined,
+      floorPrice: r.floorPrice != null ? Number(r.floorPrice) : undefined,
+    }));
+
+  const oilHedge = oilRows
+    .filter(r => r.label != null)
+    .map(r => ({
+      label: String(r.label),
+      hedgedVolume: r.hedgedVolume != null ? Number(r.hedgedVolume) : undefined,
+      floorPrice: r.floorPrice != null ? Number(r.floorPrice) : undefined,
+    }));
+
+  const out = { hero, production, gasHedge, oilHedge };
+
+  ensureDir(OUT_DIR);
+  fs.writeFileSync(OUT_JSON, JSON.stringify(out, null, 2));
+  console.log(`Q3 builder: wrote ${OUT_JSON} (prod:${production.length} gas:${gasHedge.length} oil:${oilHedge.length})`);
 }
 
-main().catch(err => {
-  console.error('Failed to build q3-2025.blocks.json from Excel.');
-  console.error(err);
-  process.exit(1);
-});
+main();

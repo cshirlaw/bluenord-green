@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "check:filenames": "bash scripts/check-filenames.sh",
-    "prebuild": "npm run build:reports && npm run build:q2-from-xlsx && npm run build:q3-from-xlsx",
+    "prebuild": "npm run build:reports && npm run build:q3-from-xlsx",
     "build:q2-from-xlsx": "node scripts/build-q2-2025-from-xlsx.mjs",
     "build:q3-from-xlsx": "node scripts/build-q3-2025-from-xlsx.mjs"
   },
