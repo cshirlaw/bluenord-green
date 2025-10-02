@@ -10,7 +10,7 @@ const BRAND = {
 };
 
 const ASSETS = {
-  logo: '/images/brand/bluenord-logo-260925.png',
+  logo: '/images/brand/bluenord-logo-260925.png', // adjust if your logo path differs in Green
 };
 
 /* --------------------------- Breadcrumbs -------------------------- */
@@ -57,9 +57,7 @@ export default function FinancialsPage() {
           <img src={ASSETS.logo} alt="BlueNord" className="h-7 w-auto" />
           <div className="ml-1">
             <h1 className="text-lg font-semibold">Financials</h1>
-            <p className="text-xs opacity-90">
-              Interactive quarterlies and key investor documents.
-            </p>
+            <p className="text-xs opacity-90">Interactive quarterlies and key investor documents.</p>
           </div>
         </div>
       </div>
