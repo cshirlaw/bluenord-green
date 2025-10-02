@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
-  ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  BarChart, Bar, PieChart, Pie, Cell, RadialBarChart, RadialBar, PolarAngleAxis, LabelList,
+  ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, Legend as RLegend,
+  BarChart, Bar,
 } from 'recharts';
 
-/* ----------------------------- Brand ----------------------------- */
 const BRAND = {
   primary: '#0A2A4A',
   accent: '#00A3E0',
@@ -18,58 +17,44 @@ const BRAND = {
   border: '#E5E7EB',
 };
 const CHART = {
-  grid: BRAND.border,
-  palette: ['#00A3E0', '#2563EB', '#F59E0B', '#10B981', '#EF4444', '#6B7280'],
+  colors: {
+    grid: BRAND.border,
+    avg: BRAND.accent,
+    peak: '#F97316',
+    hedgedVolume: '#2563EB',
+    floorPrice: BRAND.positive,
+  },
 };
 
-/* ----------------------------- Types ----------------------------- */
-type Slice = { label: string; value: number };
+type ProductionPoint = { month: string; avg: number; peak: number };
+type HedgePoint = { label: string; hedgedVolume?: number; floorPrice?: number };
+type QData = {
+  hero: { title: string; subtitle?: string };
+  production: ProductionPoint[];
+  gasHedge: HedgePoint[];
+  oilHedge: HedgePoint[];
+};
 
-type ChartsRowItem =
-  | { kind: 'kpi'; label: string; value: string; unit?: string; hint?: string }
-  | { kind: 'donut'; title: string; unit?: string; total?: number; slices: Slice[] }
-  | { kind: 'radial'; title: string; unit?: string; slices: Slice[] }
-  | { kind: 'stacked100'; title: string; unit?: string; slices: Slice[] }
-  | { kind: 'bar'; title: string; unit?: string; data: { label: string; value: number; approx?: boolean }[]; notes?: string };
+const INLINE_SAMPLE: QData = {
+  hero: {
+    title: 'Q3 2025 presentation (interactive)',
+    subtitle: 'Replace via /public/data/financials/q3-2025.json generated from data/input/q3-2025.xlsx',
+  },
+  production: [
+    { month: 'Jul-25', avg: 26, peak: 30 },
+    { month: 'Aug-25', avg: 25, peak: 29 },
+    { month: 'Sep-25', avg: 27, peak: 31 },
+  ],
+  gasHedge: [
+    { label: 'Q4-2025', hedgedVolume: 60, floorPrice: 65 },
+    { label: 'Q1-2026', hedgedVolume: 50, floorPrice: 63 },
+  ],
+  oilHedge: [
+    { label: 'Q4-2025', hedgedVolume: 40, floorPrice: 70 },
+    { label: 'Q1-2026', hedgedVolume: 35, floorPrice: 68 },
+  ],
+};
 
-type Block =
-  | { type: 'hero'; image: string; logo?: string; title: string; subtitle?: string }
-  | { type: 'statKpi'; label: string; value: string; unit?: string; hint?: string }
-  | { type: 'chartsRow'; cols?: 2 | 3 | 4; items: ChartsRowItem[] }
-  | { type: 'figure'; src: string; caption?: string }
-  | { type: 'callouts'; items: string[] }
-  | { type: 'footnotes'; items: string[]; source?: { pdf?: string; pageHint?: string }; updateCadence?: string }
-  | { type: 'barLine'; title: string; yLeftUnit?: string; series: { label: string; avg: number; peak: number }[]; notes?: string }
-  | {
-      type: 'hedgeTabs';
-      kpis: { label: string; value: string }[];
-      oil: {
-        unitVolume: string; unitPrice: string;
-        rows: { period: string; volume: number; price: number }[];
-        totals: { label: string; value: number; unit: string }[];
-        avgPrices: { label: string; value: number; unit: string }[];
-        spot: number;
-      };
-      gas: {
-        unitVolume: string; unitPrice: string;
-        rows: { period: string; volume: number; price: number }[];
-        totals: { label: string; value: number; unit: string }[];
-        avgPrices: { label: string; value: number; unit: string }[];
-        spot: number;
-      };
-      disclaimer?: string[];
-    }
-  | {
-      type: 'checklistPills';
-      title?: string;
-      columns: { heading: string; items: { text: string; highlight?: boolean }[] }[];
-      sideNotes?: string[];
-    };
-
-type Slide = { id: string; title?: string; blocks: Block[] };
-type BlocksDoc = { slides: Slide[] };
-
-/* ----------------------------- UI bits ----------------------------- */
 function Breadcrumbs({ items, className = '' }: { items: { href: string; label: string }[]; className?: string }) {
   return (
     <nav aria-label="Breadcrumb" className={`text-xs md:text-sm ${className}`}>
@@ -80,7 +65,9 @@ function Breadcrumbs({ items, className = '' }: { items: { href: string; label: 
             {i === items.length - 1 ? (
               <span className="text-gray-700">{it.label}</span>
             ) : (
-              <Link href={it.href} className="hover:underline">{it.label}</Link>
+              <Link href={it.href} className="hover:underline">
+                {it.label}
+              </Link>
             )}
           </li>
         ))}
@@ -89,500 +76,140 @@ function Breadcrumbs({ items, className = '' }: { items: { href: string; label: 
   );
 }
 
-function Section({ title, children }: { title?: string; children: React.ReactNode }) {
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return isMobile;
+}
+
+function ChartShell({ children }: { children: React.ReactNode }) {
   return (
-    <section className="mt-8 rounded-2xl border bg-white/70 p-5 shadow-sm" style={{ borderColor: BRAND.border }}>
-      {title && <h2 className="text-xl font-semibold" style={{ color: BRAND.text }}>{title}</h2>}
-      <div className={title ? 'mt-4' : ''}>{children}</div>
+    <div className="w-full min-w-0 overflow-hidden rounded-2xl border bg-white/70 p-4 md:p-5 shadow-sm" style={{ borderColor: BRAND.border }}>
+      {children}
+    </div>
+  );
+}
+
+function ProductionChart({ data }: { data: ProductionPoint[] }) {
+  const isMobile = useIsMobile();
+  return (
+    <div className={isMobile ? 'h-72 w-full' : 'h-96 w-full'}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ left: 8, right: 16, top: 8, bottom: 8 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART.colors.grid} />
+          <XAxis dataKey="month" interval={isMobile ? 'preserveStartEnd' : 0} tick={{ fontSize: isMobile ? 10 : 12 }} />
+          <YAxis label={{ value: 'kboe/d', angle: -90, position: 'insideLeft' }} tick={{ fontSize: isMobile ? 10 : 12 }} width={isMobile ? 32 : 40} />
+          <RTooltip formatter={(v: any, n: any) => [v, n === 'avg' ? 'Average' : 'Peak']} />
+          <RLegend />
+          <Line type="monotone" dataKey="avg"  name="Average" stroke={CHART.colors.avg}  strokeWidth={2.5} dot={{ r: 2, stroke: CHART.colors.avg,  fill: '#fff' }} activeDot={{ r: 4 }} />
+          <Line type="monotone" dataKey="peak" name="Peak"    stroke={CHART.colors.peak} strokeWidth={2.5} dot={{ r: 2, stroke: CHART.colors.peak, fill: '#fff' }} activeDot={{ r: 4 }} />
+        </LineChart>
+      </ResponsiveContainer>
+      <div className="mt-2 text-xs" style={{ color: BRAND.subtext }}>Monthly average and peak production (kboe/d). Values marked c. are indicative.</div>
+    </div>
+  );
+}
+
+function HedgeChart({ data, title }: { data: HedgePoint[]; title: string }) {
+  const isMobile = useIsMobile();
+  const margin = { left: isMobile ? 0 : 8, right: isMobile ? 0 : 16, top: 8, bottom: isMobile ? 26 : 12 };
+  const barGap = isMobile ? 2 : 6;
+  const barCategoryGap = isMobile ? '25%' : '15%';
+
+  return (
+    <div className={isMobile ? 'h-72 w-full' : 'h-96 w-full'}>
+      <div className="mb-2 text-sm font-semibold" style={{ color: BRAND.text }}>{title}</div>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={margin} barGap={barGap} barCategoryGap={barCategoryGap}>
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART.colors.grid} />
+          <XAxis dataKey="label" interval={isMobile ? 'preserveStartEnd' : 0} tick={{ fontSize: isMobile ? 10 : 12 }} angle={isMobile ? -15 : 0} dy={isMobile ? 10 : 0} height={isMobile ? 36 : undefined} />
+          <YAxis tick={{ fontSize: isMobile ? 10 : 12 }} width={isMobile ? 28 : 40} />
+          <RTooltip />
+          <RLegend verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: isMobile ? 8 : 6, fontSize: isMobile ? 11 : 12 }} />
+          <Bar dataKey="hedgedVolume" name="Hedged volume" fill="#2563EB" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="floorPrice"  name="Floor price"  fill="#10B981" radius={[6, 6, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+      <div className="mt-2 text-xs" style={{ color: BRAND.subtext }}>Hedged volume and floor price by quarter (illustrative).</div>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mt-10">
+      <h2 className="text-lg font-semibold" style={{ color: BRAND.text }}>{title}</h2>
+      <div className="mt-4">{children}</div>
     </section>
   );
 }
 
-function KPI({ label, value, unit, hint }: { label: string; value: string; unit?: string; hint?: string }) {
-  return (
-    <div className="h-full rounded-2xl border p-4" style={{ borderColor: BRAND.border }}>
-      <div className="text-sm" style={{ color: BRAND.subtext }}>{label}</div>
-      <div className="mt-1 text-2xl font-semibold" style={{ color: BRAND.text }}>
-        {value}{unit ? <span className="ml-1 text-base font-normal">{unit}</span> : null}
-      </div>
-      {hint && <div className="mt-1 text-xs" style={{ color: BRAND.subtext }}>{hint}</div>}
-    </div>
-  );
-}
-
-/* ----------------------------- Charts ----------------------------- */
-function Donut({ item }: { item: Extract<ChartsRowItem, { kind: 'donut' }> }) {
-  const data = item.slices.map((s) => ({ name: s.label, value: s.value }));
-  return (
-    <div className="w-full">
-      <div className="mb-2 text-sm font-medium" style={{ color: BRAND.text }}>{item.title}</div>
-      <div className="h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Tooltip formatter={(v: any) => [`${v}`, '']} />
-            <Legend />
-            <Pie data={data} dataKey="value" nameKey="name" innerRadius="55%" outerRadius="80%">
-              {data.map((_, i) => <Cell key={i} fill={CHART.palette[i % CHART.palette.length]} />)}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-      {item.unit && <div className="mt-2 text-xs" style={{ color: BRAND.subtext }}>Units: {item.unit}</div>}
-    </div>
-  );
-}
-
-function Radial({ item }: { item: Extract<ChartsRowItem, { kind: 'radial' }> }) {
-  const total = item.slices.reduce((a, s) => a + s.value, 0) || 1;
-  const data = item.slices.map((s, i) => ({
-    name: s.label,
-    value: s.value,
-    percent: (s.value / total) * 100,
-    fill: CHART.palette[i % CHART.palette.length],
-  }));
-  return (
-    <div className="w-full">
-      <div className="mb-2 text-sm font-medium" style={{ color: BRAND.text }}>{item.title}</div>
-      <div className="h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <RadialBarChart innerRadius="45%" outerRadius="85%" data={data} startAngle={90} endAngle={-270}>
-            <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-            <Tooltip formatter={(v: any, _n: any, p: any) => [`${(p.payload.percent).toFixed(1)}%`, p.payload.name]} />
-            <Legend />
-            <RadialBar background dataKey="percent" cornerRadius={8}>
-              {data.map((d, i) => <Cell key={i} fill={d.fill} />)}
-            </RadialBar>
-          </RadialBarChart>
-        </ResponsiveContainer>
-      </div>
-      {item.unit && <div className="mt-2 text-xs" style={{ color: BRAND.subtext }}>Units: {item.unit}</div>}
-    </div>
-  );
-}
-
-/** 100% stacked bar (horizontal) — sorted largest→smallest, centered labels, custom legend */
-function Stacked100({ item }: { item: Extract<ChartsRowItem, { kind: 'stacked100' }> }) {
-  const sorted = [...item.slices].sort((a, b) => b.value - a.value);
-  const total = sorted.reduce((a, s) => a + s.value, 0) || 1;
-
-  const row: Record<string, number | string> = { name: 'Ownership' };
-  sorted.forEach((s) => { row[s.label] = (s.value / total) * 100; });
-  const data = [row];
-
-  function renderInsideLabel(props: any, label: string) {
-    const { x = 0, y = 0, width = 0, height = 0, value = 0 } = props || {};
-    if (width <= 0 || height <= 0) return null;
-
-    const pct = `${Number(value).toFixed(1)}%`;
-    const long = `${label} ${pct}`;
-    const textToShow = width >= 120 ? long : width >= 56 ? pct : '';
-    if (!textToShow) return null;
-
-    const cx = x + width / 2;
-    const cy = y + height / 2;
-    return (
-      <text
-        x={cx}
-        y={cy}
-        dy="0.35em"
-        textAnchor="middle"
-        fill="#ffffff"
-        fontSize={12}
-        fontWeight={700}
-        style={{
-          paintOrder: 'stroke',
-          stroke: 'rgba(0,0,0,0.35)',
-          strokeWidth: 3,
-          strokeLinejoin: 'round',
-          pointerEvents: 'none',
-        }}
-      >
-        {textToShow}
-      </text>
-    );
-  }
-
-  return (
-    <div className="w-full">
-      <div className="mb-2 text-sm font-medium" style={{ color: BRAND.text }}>{item.title}</div>
-      <div className="h-24">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart layout="vertical" data={data} margin={{ left: 8, right: 16, top: 8, bottom: 8 }}>
-            <CartesianGrid horizontal={false} stroke={CHART.grid} />
-            <XAxis type="number" domain={[0, 100]} hide />
-            <YAxis type="category" dataKey="name" hide />
-            <Tooltip formatter={(v: any, name: string) => [`${Number(v).toFixed(1)}%`, name]} />
-            {sorted.map((s, i) => (
-              <Bar key={s.label} dataKey={s.label} stackId="a" fill={CHART.palette[i % CHART.palette.length]}>
-                <LabelList dataKey={s.label} content={(p: any) => renderInsideLabel(p, s.label)} />
-              </Bar>
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
-        {sorted.map((s, i) => (
-          <span key={s.label} className="inline-flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-sm" style={{ background: CHART.palette[i % CHART.palette.length] }} aria-hidden />
-            <span className="font-medium" style={{ color: BRAND.text }}>{s.label}</span>
-            <span style={{ color: BRAND.subtext }}>&nbsp;{((s.value / total) * 100).toFixed(1)}%</span>
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-1 text-xs" style={{ color: BRAND.subtext }}>
-        {item.unit ? `Units: ${item.unit}. ` : ''}Shares sum to 100%.
-      </div>
-    </div>
-  );
-}
-
-function SimpleBar({ item }: { item: Extract<ChartsRowItem, { kind: 'bar' }> }) {
-  const data = item.data;
-  return (
-    <div className="w-full">
-      <div className="mb-2 text-sm font-medium" style={{ color: BRAND.text }}>{item.title}</div>
-      <div className="h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ left: 8, right: 16, top: 8, bottom: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={CHART.grid} />
-            <XAxis dataKey="label" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-              {data.map((_, i) => <Cell key={i} fill={CHART.palette[i % CHART.palette.length]} />)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <div className="mt-2 text-xs" style={{ color: BRAND.subtext }}>
-        {item.unit ? `Unit: ${item.unit}. ` : ''}{item.notes ?? ''}
-      </div>
-    </div>
-  );
-}
-
-/* ----------------------------- Bar/Line Combo ----------------------------- */
-function BarLine({
-  title,
-  unit,
-  series,
-  spot,
-  leftLabel = 'Series A',
-  rightLabel = 'Series B',
-  unitLabelText = 'Left axis unit:',
-}: {
-  title: string;
-  unit?: string;
-  series: { label: string; left: number; right: number }[];
-  spot?: number;
-  leftLabel?: string;
-  rightLabel?: string;
-  unitLabelText?: string;
-}) {
-  return (
-    <div className="w-full">
-      <div className="mb-2 text-sm font-medium" style={{ color: BRAND.text }}>{title}</div>
-      <div className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={series} margin={{ left: 8, right: 16, top: 8, bottom: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={CHART.grid} />
-            <XAxis dataKey="label" />
-            <YAxis yAxisId="L" />
-            <YAxis yAxisId="R" orientation="right" />
-            <Tooltip />
-            <Legend />
-            <Bar yAxisId="L" dataKey="left" name={leftLabel} radius={[6, 6, 0, 0]} />
-            <Line yAxisId="R" type="monotone" dataKey="right" name={rightLabel} stroke={BRAND.accent} strokeWidth={2.5} dot={{ r: 2 }} activeDot={{ r: 4 }} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      {unit && <div className="mt-2 text-xs" style={{ color: BRAND.subtext }}>{unitLabelText} {unit}</div>}
-      {typeof spot === 'number' && <div className="mt-1 text-xs" style={{ color: BRAND.subtext }}>Dashed spot ref: {spot}</div>}
-    </div>
-  );
-}
-
-/* ----------------------------- Hedge Tabs ----------------------------- */
-function HedgeTabs({ block }: { block: Extract<Block, { type: 'hedgeTabs' }> }) {
-  const [tab, setTab] = useState<'oil' | 'gas'>('oil');
-  const active = block[tab];
-
-  const series = active.rows.map(r => ({ label: r.period, left: r.volume, right: r.price }));
-
-  return (
-    <div>
-      <div className="grid gap-3 md:grid-cols-3">
-        {block.kpis.map((k, i) => <KPI key={i} label={k.label} value={k.value} />)}
-      </div>
-
-      <div className="mt-4 flex gap-2">
-        {(['oil','gas'] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`rounded-xl border px-3 py-1.5 text-sm ${tab === t ? 'bg-gray-100' : ''}`}
-            style={{ borderColor: BRAND.border, color: BRAND.text }}
-          >
-            {t === 'oil' ? 'Oil' : 'Gas'}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-4">
-        {/* Hedging wording preserved */}
-        <BarLine
-          title={`${tab === 'oil' ? 'Oil' : 'Gas'} hedged volume & price`}
-          unit={active.unitVolume}
-          unitLabelText="Left axis unit:"
-          series={series}
-          spot={active.spot}
-          leftLabel="Hedged volume"
-          rightLabel="Price / floor"
-        />
-      </div>
-
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <div className="rounded-2xl border p-4" style={{ borderColor: BRAND.border }}>
-          <div className="text-sm font-medium" style={{ color: BRAND.text }}>Totals</div>
-          <ul className="mt-2 list-disc pl-5 text-sm" style={{ color: BRAND.subtext }}>
-            {active.totals.map((t, i) => <li key={i}>{t.label}: {t.value} {t.unit}</li>)}
-          </ul>
-        </div>
-        <div className="rounded-2xl border p-4" style={{ borderColor: BRAND.border }}>
-          <div className="text-sm font-medium" style={{ color: BRAND.text }}>Average hedged price</div>
-          <ul className="mt-2 list-disc pl-5 text-sm" style={{ color: BRAND.subtext }}>
-            {active.avgPrices.map((t, i) => <li key={i}>{t.label}: {t.value} {active.unitPrice}</li>)}
-          </ul>
-        </div>
-      </div>
-
-      <div className="mt-4 overflow-auto rounded-2xl border" style={{ borderColor: BRAND.border }}>
-        <table className="min-w-[600px] w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr className="text-left">
-              <th className="px-3 py-2 font-medium">Period</th>
-              <th className="px-3 py-2 font-medium">Volume ({active.unitVolume})</th>
-              <th className="px-3 py-2 font-medium">Price ({active.unitPrice})</th>
-            </tr>
-          </thead>
-          <tbody>
-            {active.rows.map((r, i) => (
-              <tr key={i} className="border-t" style={{ borderColor: BRAND.border }}>
-                <td className="px-3 py-2">{r.period}</td>
-                <td className="px-3 py-2">{r.volume}</td>
-                <td className="px-3 py-2">{r.price}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {block.disclaimer?.length ? (
-        <div className="mt-3 text-xs" style={{ color: BRAND.subtext }}>
-          {block.disclaimer.join(' ')}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-/* ----------------------------- Checklist Pills ----------------------------- */
-function ChecklistPills({ block }: { block: Extract<Block, { type: 'checklistPills' }> }) {
-  return (
-    <div>
-      {block.title && <div className="mb-2 text-sm font-medium" style={{ color: BRAND.text }}>{block.title}</div>}
-      <div className="grid gap-4 md:grid-cols-2">
-        {block.columns.map((col, idx) => (
-          <div key={idx} className="rounded-2xl border p-4" style={{ borderColor: BRAND.border }}>
-            <div className="mb-2 font-medium" style={{ color: BRAND.text }}>{col.heading}</div>
-            <ul className="space-y-2">
-              {col.items.map((it, i) => (
-                <li key={i}>
-                  <div
-                    className={`inline-block rounded-full border px-3 py-1.5 text-sm shadow-sm ${
-                      it.highlight ? 'ring-2 ring-rose-300 bg-rose-50' : 'bg-white'
-                    }`}
-                    style={{ borderColor: BRAND.border, color: BRAND.text }}
-                  >
-                    {it.text}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-      {!!block.sideNotes?.length && (
-        <div className="mt-3 grid gap-2 md:grid-cols-2">
-          {block.sideNotes.map((n, i) => (
-            <div key={i} className="rounded-xl border px-3 py-2 text-sm" style={{ borderColor: BRAND.border, color: BRAND.subtext }}>
-              {n}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ----------------------------- Block renderer ----------------------------- */
-function BlockRenderer({ block }: { block: Block }) {
-  switch (block.type) {
-    case 'hero':
-      return (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-          <div className="overflow-hidden rounded-3xl border shadow-sm" style={{ borderColor: BRAND.border }}>
-            {/* Brand bar */}
-            <div
-              className="flex items-center gap-3 px-5 py-3"
-              style={{ background: `linear-gradient(90deg, ${BRAND.primary} 0%, ${BRAND.accent} 100%)`, color: 'white' }}
-            >
-              {block.logo && <img src={block.logo} alt="BlueNord" className="h-6 w-auto" />}
-              <span className="text-sm opacity-90">Investor Briefing</span>
-            </div>
-
-            {/* Image + overlays + content */}
-            <div className="relative">
-              <img src={block.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
-              <div className="absolute inset-0 bg-white/40" />
-              <div
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
-                style={{ background: 'linear-gradient(0deg, rgba(255,255,255,0.92), rgba(255,255,255,0))' }}
-              />
-              <div className="relative z-10 min-h-[240px] p-6 md:p-7">
-                <h1 className="text-2xl font-semibold" style={{ color: BRAND.primary }}>{block.title}</h1>
-                {block.subtitle && (
-                  <p className="mt-2 max-w-3xl text-sm" style={{ color: BRAND.text }}>
-                    {block.subtitle}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      );
-
-    case 'statKpi':
-      return <KPI label={block.label} value={block.value} unit={block.unit} hint={block.hint} />;
-
-    case 'chartsRow': {
-      const cols = block.cols ?? 3;
-      const colClass = cols === 2 ? 'md:grid-cols-2' : cols === 4 ? 'md:grid-cols-4' : 'md:grid-cols-3';
-      return (
-        <div className={`grid gap-4 ${colClass}`}>
-          {block.items.map((it, i) => {
-            if (it.kind === 'kpi') return <KPI key={i} label={it.label} value={it.value} unit={it.unit} hint={it.hint} />;
-            if (it.kind === 'donut') return <Donut key={i} item={it} />;
-            if (it.kind === 'radial') return <Radial key={i} item={it} />;
-            if (it.kind === 'stacked100') return <Stacked100 key={i} item={it} />;
-            return <SimpleBar key={i} item={it} />;
-          })}
-        </div>
-      );
-    }
-
-    case 'figure':
-      return (
-        <div className="rounded-2xl border p-2" style={{ borderColor: BRAND.border }}>
-          <img src={block.src} alt={block.caption ?? ''} className="w-full rounded-xl" />
-          {block.caption && <div className="p-2 text-xs" style={{ color: BRAND.subtext }}>{block.caption}</div>}
-        </div>
-      );
-
-    case 'callouts':
-      return (
-        <ul className="list-disc space-y-1 pl-5 text-sm" style={{ color: BRAND.subtext }}>
-          {block.items.map((t, i) => <li key={i}>{t}</li>)}
-        </ul>
-      );
-
-    case 'footnotes':
-      return (
-        <div className="text-xs" style={{ color: BRAND.subtext }}>
-          {block.items.map((t, i) => <p key={i} className="mt-1">{t}</p>)}
-          {block.source?.pdf && (
-            <p className="mt-2">
-              Source: <a className="underline" href={block.source.pdf} target="_blank" rel="noreferrer">PDF</a>
-              {block.source.pageHint ? ` (${block.source.pageHint})` : ''}
-              {block.updateCadence ? ` · Update cadence: ${block.updateCadence}` : ''}
-            </p>
-          )}
-        </div>
-      );
-
-    case 'barLine':
-      return (
-        <BarLine
-          title={block.title}
-          unit={block.yLeftUnit}
-          unitLabelText="Unit:"
-          leftLabel="Average production"
-          rightLabel="Peak production"
-          series={block.series.map(p => ({ label: p.label, left: p.avg, right: p.peak }))}
-        />
-      );
-
-    case 'hedgeTabs':
-      return <HedgeTabs block={block} />;
-
-    case 'checklistPills':
-      return <ChecklistPills block={block} />;
-
-    default:
-      return null;
-  }
-}
-
-/* ----------------------------- Page ----------------------------- */
-export default function FinancialsQ3Page() {
-  const [doc, setDoc] = useState<BlocksDoc | null>(null);
+export default function Q3InteractivePage() {
+  const [data, setData] = useState<QData | null>(null);
 
   useEffect(() => {
     let alive = true;
-    fetch('/data/briefings/q3-2025.blocks.json', { cache: 'no-store' })
-      .then(r => (r.ok ? r.json() : null))
-      .then((j) => { if (!alive) return; setDoc(j && (j as BlocksDoc).slides ? (j as BlocksDoc) : null); })
-      .catch(() => setDoc(null));
+    fetch('/data/financials/q3-2025.json', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (!alive) return; setData(j && j.production ? (j as QData) : INLINE_SAMPLE); })
+      .catch(() => setData(INLINE_SAMPLE));
     return () => { alive = false; };
   }, []);
 
+  const hero = data?.hero ?? INLINE_SAMPLE.hero;
+  const production = data?.production ?? INLINE_SAMPLE.production;
+  const gasHedge = data?.gasHedge ?? INLINE_SAMPLE.gasHedge;
+  const oilHedge = data?.oilHedge ?? INLINE_SAMPLE.oilHedge;
+  const latestAvg = useMemo(() => production.at(-1)?.avg, [production]);
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      {/* Header crumbs */}
-      <Breadcrumbs
-        className="mb-4"
-        items={[
-          { href: '/', label: 'Home' },
-          { href: '/financials', label: 'Financials' },
-          { href: '/financials/q3-2025', label: 'Q3 2025 presentation' },
-        ]}
-      />
+    <div className="mx-auto max-w-7xl px-4 py-10">
+      <Breadcrumbs className="mb-4" items={[{ href: '/', label: 'Home' }, { href: '/financials', label: 'Financials' }, { href: '/financials/q3-2025', label: 'Q3 2025 presentation' }]} />
 
-      {!doc ? (
-        <div className="rounded-2xl border p-6 text-sm" style={{ borderColor: BRAND.border, color: BRAND.subtext }}>
-          Couldn’t load blocks JSON. Check <code>/public/data/briefings/q3-2025.blocks.json</code>.
-        </div>
-      ) : (
-        doc.slides.map((s) => (
-          <Section key={s.id} title={s.title}>
-            <div className="grid gap-5">
-              {s.blocks.map((b, i) => <BlockRenderer key={i} block={b} />)}
+      <div className="overflow-hidden rounded-3xl border shadow-sm" style={{ borderColor: BRAND.border }}>
+        <div className="bg-white/80 p-6 md:p-7">
+          <h1 className="text-2xl font-semibold" style={{ color: BRAND.text }}>{hero.title}</h1>
+          {hero.subtitle && <p className="mt-2 max-w-2xl text-sm" style={{ color: BRAND.subtext }}>{hero.subtitle}</p>}
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+            <div className="rounded-2xl border p-3" style={{ borderColor: BRAND.border }}>
+              <div className="text-xs" style={{ color: BRAND.subtext }}>Latest avg production</div>
+              <div className="mt-1 text-xl font-semibold" style={{ color: BRAND.text }}>
+                {latestAvg ? `${Math.round(latestAvg)} kboe/d` : '—'}
+              </div>
             </div>
-          </Section>
-        ))
-      )}
+            <div className="rounded-2xl border p-3" style={{ borderColor: BRAND.border }}>
+              <div className="text-xs" style={{ color: BRAND.subtext }}>Gas hedge points</div>
+              <div className="mt-1 text-xl font-semibold" style={{ color: BRAND.text }}>{gasHedge.length}</div>
+            </div>
+            <div className="rounded-2xl border p-3" style={{ borderColor: BRAND.border }}>
+              <div className="text-xs" style={{ color: BRAND.subtext }}>Oil hedge points</div>
+              <div className="mt-1 text-xl font-semibold" style={{ color: BRAND.text }}>{oilHedge.length}</div>
+            </div>
+            <div className="rounded-2xl border p-3" style={{ borderColor: BRAND.border }}>
+              <div className="text-xs" style={{ color: BRAND.subtext }}>Data source</div>
+              <div className="mt-1 text-xl font-semibold" style={{ color: BRAND.text }}>XLSX → JSON</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      {/* Footer crumbs */}
-      <Breadcrumbs
-        className="mt-10"
-        items={[
-          { href: '/', label: 'Home' },
-          { href: '/financials', label: 'Financials' },
-          { href: '/financials/q3-2025', label: 'Q3 2025 presentation' },
-        ]}
-      />
+      <Section title="Production">
+        <ChartShell><ProductionChart data={production} /></ChartShell>
+      </Section>
+
+      <Section title="Hedge portfolio snapshots">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="min-w-0"><ChartShell><HedgeChart title="Gas hedge portfolio" data={gasHedge} /></ChartShell></div>
+          <div className="min-w-0"><ChartShell><HedgeChart title="Oil hedge portfolio" data={oilHedge} /></ChartShell></div>
+        </div>
+      </Section>
+
+      <Breadcrumbs className="mt-10" items={[{ href: '/', label: 'Home' }, { href: '/financials', label: 'Financials' }, { href: '/financials/q3-2025', label: 'Q3 2025 presentation' }]} />
     </div>
   );
 }
