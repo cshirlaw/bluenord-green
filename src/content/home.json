@@ -1,0 +1,28 @@
+{
+  "hero": {
+    "eyebrow": "Bluenord",
+    "title": "Energy with discipline",
+    "intro": "Focused operations, clear governance, investor-grade reporting."
+  },
+  "highlights": [
+    {
+      "title": "The Company",
+      "text": "Who we are, how we operate, and what we stand for.",
+      "href": "/the-company"
+    },
+    {
+      "title": "Assets",
+      "text": "A concise view of our portfolio and key metrics.",
+      "href": "/assets"
+    },
+    {
+      "title": "Investors",
+      "text": "KPIs, reports, and news for shareholders and analysts.",
+      "href": "/investors"
+    }
+  ],
+  "ctas": [
+    { "label": "Contact us", "href": "/contact" },
+    { "label": "Investor centre", "href": "/investors" }
+  ]
+}

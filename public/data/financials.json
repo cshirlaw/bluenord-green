@@ -1,0 +1,14 @@
+{
+  "stats": [
+    { "label": "Production", "value": "28.4 kboe/d" },
+    { "label": "EBITDA", "value": "USD 152m (Q2’25)" },
+    { "label": "Liquidity", "value": "USD 325m" },
+    { "label": "Net debt", "value": "USD 410m" }
+  ],
+  "featured": {
+    "title": "BlueNord_ASA_Pareto_Securities_Energy_Conference_10_September_2025",
+    "href": "/reports/2025/BlueNord_ASA_Pareto_Securities_Energy_Conference_10_September_2025.pdf",
+    "date": "10 Sep 2025",
+    "blurb": "Management’s financial information presentation."
+  }
+}

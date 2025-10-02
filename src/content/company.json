@@ -1,0 +1,14 @@
+{
+  "hero": { "title": "The Company", "intro": "Who we are, how we operate, and what we stand for." },
+  "pillars": [
+    { "title": "Operational excellence", "text": "Disciplined delivery across assets and projects." },
+    { "title": "People & culture", "text": "A safe, inclusive workplace focused on outcomes." },
+    { "title": "Governance", "text": "Transparent, responsible decision-making." }
+  ],
+  "stats": [
+    { "label": "Employees", "value": "—" },
+    { "label": "Operating years", "value": "—" },
+    { "label": "Countries", "value": "—" },
+    { "label": "Safety TRIR", "value": "—" }
+  ]
+}

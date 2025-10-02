@@ -1,0 +1,26 @@
+{
+  "the-company": {
+    "title": "The Company",
+    "body": [
+      "Who we are, how we operate, and what we stand for."
+    ]
+  },
+  "assets": {
+    "title": "Assets",
+    "body": [
+      "Overview of our producing fields and key projects."
+    ]
+  },
+  "investors": {
+    "title": "Investors",
+    "body": [
+      "Key information for shareholders and analysts."
+    ]
+  },
+  "contact": {
+    "title": "Contact",
+    "body": [
+      "Get in touch with us."
+    ]
+  }
+}

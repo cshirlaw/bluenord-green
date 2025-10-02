@@ -1,0 +1,8 @@
+{
+  "hero": { "title": "Assets", "intro": "Overview of our core producing fields and key projects." },
+  "items": [
+    { "name": "Danish Underground Consortium (DUC)", "location": "Danish North Sea", "status": "Producing", "blurb": "Mature assets with ongoing optimisation and infill opportunities." },
+    { "name": "Project X", "location": "North Sea", "status": "Development", "blurb": "Brownfield upgrade delivering efficiency and lower emissions." },
+    { "name": "Exploration Area A", "location": "—", "status": "Exploration", "blurb": "High-graded prospects under review." }
+  ]
+}

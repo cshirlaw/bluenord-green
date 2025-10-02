@@ -1,0 +1,137 @@
+{
+  "slides": [
+    {
+      "id": "hero",
+      "title": "BlueNord — Q2 2025 presentation (interactive)",
+      "blocks": [
+        {
+          "type": "hero",
+          "image": "/images/briefings/q2-2025/hero.png",
+          "logo": "/images/brand/bluenord-logo-260925.png",
+          "title": "Q2 2025 — Highlights & details",
+          "subtitle": "Interactive view of selected slides. Replace numbers below via spreadsheet."
+        }
+      ]
+    },
+    {
+      "id": "highlights",
+      "title": "Quarter highlights",
+      "blocks": [
+        {
+          "type": "chartsRow",
+          "cols": 3,
+          "items": []
+        }
+      ]
+    },
+    {
+      "id": "production",
+      "title": "Production — Average vs Peak",
+      "blocks": [
+        {
+          "type": "barLine",
+          "title": "Monthly production (Q2 2025)",
+          "yLeftUnit": "mboe/d",
+          "series": [
+            {
+              "label": "45748",
+              "avg": 24.2,
+              "peak": 28
+            },
+            {
+              "label": "45778",
+              "avg": 25.1,
+              "peak": 29.4
+            },
+            {
+              "label": "45809",
+              "avg": 27.3,
+              "peak": 31
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hedging",
+      "title": "Hedge portfolio (snapshot)",
+      "blocks": [
+        {
+          "type": "hedgeTabs",
+          "kpis": [
+            {
+              "label": "Oil hedged",
+              "value": "2.1 mmbbl"
+            },
+            {
+              "label": "Gas hedged",
+              "value": "800 GWh"
+            },
+            {
+              "label": "Distribution policy",
+              "value": "50–70% of operating cash flow"
+            }
+          ],
+          "oil": {
+            "unitVolume": "mmbbl",
+            "unitPrice": "$/bbl",
+            "rows": [],
+            "totals": [
+              {
+                "label": "2025",
+                "value": 2.1,
+                "unit": "mmbbl"
+              }
+            ],
+            "avgPrices": [
+              {
+                "label": "2025",
+                "value": 73.1,
+                "unit": "$/bbl"
+              }
+            ],
+            "spot": 76
+          },
+          "gas": {
+            "unitVolume": "GWh",
+            "unitPrice": "$/MWh",
+            "rows": [],
+            "totals": [
+              {
+                "label": "2025",
+                "value": 800,
+                "unit": "GWh"
+              }
+            ],
+            "avgPrices": [
+              {
+                "label": "2025",
+                "value": 34,
+                "unit": "$/MWh"
+              }
+            ],
+            "spot": 36.2
+          },
+          "disclaimer": [
+            "Numbers loaded from spreadsheet."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "notes",
+      "title": "Notes & sources",
+      "blocks": [
+        {
+          "type": "footnotes",
+          "items": [],
+          "source": {
+            "pdf": "/reports/2025/bluenord-q2-2025-presentation.pdf",
+            "pageHint": "See relevant slides"
+          },
+          "updateCadence": "quarterly"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "hero": {
+    "title": "Delivering Growth. Delivering Returns.",
+    "subtitle": "Update the subtitle here with the message you want investors to see first.",
+    "bullets": [
+      "Tyra reservoir performance: update",
+      "Hedging snapshot as of Sep 2025: update",
+      "Distribution policy: update"
+    ]
+  },
+  "pdfHref": "/reports/2025/BlueNord_ASA_Pareto_Securities_Energy_Conference_10_September_2025.pdf",
+  "production": [
+    { "month": "Mar-25", "avg": 21, "peak": 25, "approx": true },
+    { "month": "Apr-25", "avg": 23, "peak": 27, "approx": true },
+    { "month": "May-25", "avg": 26, "peak": 29, "approx": true },
+    { "month": "Jun-25", "avg": 28, "peak": 31, "approx": true },
+    { "month": "Jul-25", "avg": 26, "peak": 30, "approx": true },
+    { "month": "Aug-25", "avg": 25, "peak": 29, "approx": true }
+  ],
+  "hedge": [
+    { "label": "Q4-2025", "hedgedVolume": 60, "floorPrice": 65 },
+    { "label": "Q1-2026", "hedgedVolume": 50, "floorPrice": 63 },
+    { "label": "Q2-2026", "hedgedVolume": 45, "floorPrice": 62 }
+  ],
+  "distributions": {
+    "policy": [
+      "Prioritise sustainable ordinary dividends across the cycle",
+      "Consider supplemental distributions (buy-backs/specials) subject to leverage and outlook",
+      "Maintain balance sheet flexibility to fund development and optimisation"
+    ],
+    "recentActions": [
+      "Update with actual dividends/repurchases announced"
+    ]
+  }
+}

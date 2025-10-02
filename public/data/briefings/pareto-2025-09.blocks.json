@@ -1,0 +1,266 @@
+{
+  "slides": [
+    {
+      "id": "01-at-a-glance",
+      "title": "BlueNord at a glance",
+      "blocks": [
+        {
+          "type": "hero",
+          "image": "/images/briefings/pareto-2025-09/slides/hero.png",
+          "logo": "/images/brand/bluenord-logo-260925.png",
+          "title": "BlueNord at a glance",
+          "subtitle": "Independent E&P listed on the Oslo Stock Exchange. 36.8% non-operated interest in the Danish Underground Consortium (DUC) and a 221 mmboe reserves base with near-term production growth."
+        },
+        {
+          "type": "chartsRow",
+          "cols": 2,
+          "items": [
+            { "kind": "kpi", "label": "Reserves base", "value": "221", "unit": "mmboe", "hint": "Pareto (Sep 2025)" },
+            {
+              "kind": "donut",
+              "title": "Reserves split",
+              "unit": "mmboe",
+              "total": 221,
+              "slices": [
+                { "label": "2P Reserves", "value": 161 },
+                { "label": "2P Approved + Justified", "value": 33 },
+                { "label": "2C (Near-Term)", "value": 27 }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "chartsRow",
+          "cols": 2,
+          "items": [
+            {
+              "kind": "stacked100",
+              "title": "DUC ownership",
+              "unit": "%",
+              "slices": [
+                { "label": "TotalEnergies", "value": 43.2 },
+                { "label": "BlueNord", "value": 36.8 },
+                { "label": "Nordsøfonden", "value": 20.0 }
+              ]
+            },
+            {
+              "kind": "bar",
+              "title": "Near-term production growth",
+              "unit": "mboe/d",
+              "data": [
+                { "label": "2024", "value": 25 },
+                { "label": "Post-Tyra", "value": 50 }
+              ],
+              "notes": "Confirm exact ‘Post-Tyra’ date."
+            }
+          ]
+        },
+        {
+          "type": "callouts",
+          "items": [
+            "Map of fields and export routes",
+            "Reserves base and split",
+            "Expected production growth"
+          ]
+        },
+        {
+          "type": "footnotes",
+          "items": [
+            "DUC = Danish Underground Consortium; operator: TotalEnergies.",
+            "Figures as presented in Pareto Energy Conference (10 Sep 2025).",
+            "Production ‘Post-Tyra’ c.50 mboe/d — confirm the reference month/quarter."
+          ],
+          "source": {
+            "pdf": "/reports/2025/BlueNord_ASA_Pareto_Securities_Energy_Conference_10_September_2025.pdf",
+            "pageHint": "Slide 1"
+          },
+          "updateCadence": "quarterly"
+        }
+      ]
+    },
+    {
+      "id": "02-value-proposition",
+      "title": "Our Value Proposition",
+      "blocks": [
+        {
+          "type": "callouts",
+          "items": [
+            "Maximise distributions",
+            "Maintain a conservative capital structure"
+          ]
+        },
+        {
+          "type": "checklistPills",
+          "columns": [
+            {
+              "heading": "Near-Term | Strongly Cash Generative",
+              "items": [
+                { "text": "Robust base production" },
+                { "text": "Transformational growth" },
+                { "text": "Volumes hedged & flexible low-cost base" },
+                { "text": "Substantial tax losses" }
+              ]
+            },
+            {
+              "heading": "Long-Term | Positive Outlook for Value Creation",
+              "items": [
+                { "text": "Supportive regulatory regime" },
+                { "text": "Accretive investment projects" },
+                { "text": "Stable production outlook" },
+                { "text": "Fit-for-purpose capital structure" }
+              ]
+            }
+          ],
+          "sideNotes": [
+            "Distribution policy: 50–70% of operating cash flow",
+            "Desire to maintain meaningful returns in 2027+"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "03-transformational-growth",
+      "title": "Transformational Growth (Tyra online)",
+      "blocks": [
+        {
+          "type": "checklistPills",
+          "title": "Growth drivers",
+          "columns": [
+            {
+              "heading": "Near-Term",
+              "items": [
+                { "text": "Robust base production" },
+                { "text": "Transformational growth", "highlight": true },
+                { "text": "Volumes hedged & flexible low-cost base" },
+                { "text": "Substantial tax losses" }
+              ]
+            },
+            {
+              "heading": "Long-Term",
+              "items": [
+                { "text": "Supportive regulatory regime" },
+                { "text": "Accretive investment projects" },
+                { "text": "Stable production outlook" },
+                { "text": "Fit-for-purpose capital structure" }
+              ]
+            }
+          ],
+          "sideNotes": [
+            "Tyra ramp-up doubles output; confirms ability to fund distributions while maintaining balance sheet resilience."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "04-tyra-performance",
+      "title": "Tyra — Strong reservoir performance",
+      "blocks": [
+        {
+          "type": "barLine",
+          "title": "Tyra production (avg vs peak)",
+          "yLeftUnit": "mboe/d",
+          "series": [
+            { "label": "Mar-25", "avg": 5.5, "peak": 21 },
+            { "label": "Apr-25", "avg": 12.8, "peak": 23 },
+            { "label": "May-25", "avg": 18.2, "peak": 26 },
+            { "label": "Jun-25", "avg": 19.5, "peak": 28 },
+            { "label": "Jul-25", "avg": 19.5, "peak": 26 },
+            { "label": "Aug-25", "avg": 15.3, "peak": 25 }
+          ],
+          "notes": "Operator focus on stable operations and above-ground reliability improvements (Q3/Q4 2025)."
+        },
+        {
+          "type": "footnotes",
+          "items": [
+            "Intended to improve production stability and address process control challenges."
+          ],
+          "source": {
+            "pdf": "/reports/2025/BlueNord_ASA_Pareto_Securities_Energy_Conference_10_September_2025.pdf",
+            "pageHint": "Tyra performance slide"
+          },
+          "updateCadence": "monthly"
+        }
+      ]
+    },
+    {
+      "id": "06-hedging",
+      "title": "Hedge portfolio — September 2025",
+      "blocks": [
+        {
+          "type": "hedgeTabs",
+          "kpis": [
+            { "label": "Oil hedged", "value": "2025: ~54% · 2026: ~42% · 2027: ~25%" },
+            { "label": "Gas hedged", "value": "2025: ~61% · 2026: ~42% · 2027: ~13%" },
+            { "label": "Distribution policy", "value": "50–70% of operating cash flow" }
+          ],
+          "oil": {
+            "unitVolume": "mmbbl",
+            "unitPrice": "$/bbl",
+            "rows": [
+              { "period": "Q3-25", "volume": 1.2, "price": 73.4 },
+              { "period": "Q4-25", "volume": 1.28, "price": 72.8 },
+              { "period": "Q1-26", "volume": 1.11, "price": 69.7 },
+              { "period": "Q2-26", "volume": 1.11, "price": 69.6 },
+              { "period": "Q3-26", "volume": 0.87, "price": 66.7 },
+              { "period": "Q4-26", "volume": 0.87, "price": 66.8 },
+              { "period": "Q1-27", "volume": 0.72, "price": 65.6 },
+              { "period": "Q2-27", "volume": 0.72, "price": 65.7 },
+              { "period": "Q3-27", "volume": 0.35, "price": 65.8 },
+              { "period": "Q4-27", "volume": 0.35, "price": 65.9 }
+            ],
+            "totals": [
+              { "label": "Total (Q3–Q4 2025)", "value": 2.48, "unit": "mmbbl" },
+              { "label": "2026", "value": 3.96, "unit": "mmbbl" },
+              { "label": "2027", "value": 2.13, "unit": "mmbbl" }
+            ],
+            "avgPrices": [
+              { "label": "Avg (Q3–Q4 2025)", "value": 73.1, "unit": "$/bbl" },
+              { "label": "2026", "value": 68.4, "unit": "$/bbl" },
+              { "label": "2027", "value": 65.7, "unit": "$/bbl" }
+            ],
+            "spot": 66.4
+          },
+          "gas": {
+            "unitVolume": "GWh",
+            "unitPrice": "€/MWh",
+            "rows": [
+              { "period": "Q3-25", "volume": 2.31, "price": 39.5 },
+              { "period": "Q4-25", "volume": 1.98, "price": 38.5 },
+              { "period": "Q1-26", "volume": 1.98, "price": 38.5 },
+              { "period": "Q2-26", "volume": 1.4, "price": 33.1 },
+              { "period": "Q3-26", "volume": 1.4, "price": 33.1 },
+              { "period": "Q4-26", "volume": 1.23, "price": 34.5 },
+              { "period": "Q1-27", "volume": 1.23, "price": 34.7 },
+              { "period": "Q2-27", "volume": 0.21, "price": 29.6 },
+              { "period": "Q3-27", "volume": 0.21, "price": 29.3 },
+              { "period": "Q4-27", "volume": 0.18, "price": 30.8 },
+              { "period": "Q1-28", "volume": 0.18, "price": 30.8 }
+            ],
+            "totals": [
+              { "label": "Q3 2025", "value": 2.31, "unit": "GWh" },
+              { "label": "Winter 25/26", "value": 3.96, "unit": "GWh" },
+              { "label": "Summer 26", "value": 2.79, "unit": "GWh" },
+              { "label": "Winter 26/27", "value": 2.46, "unit": "GWh" },
+              { "label": "Summer 27", "value": 0.42, "unit": "GWh" },
+              { "label": "Winter 27/28", "value": 0.36, "unit": "GWh" }
+            ],
+            "avgPrices": [
+              { "label": "Avg (Q3 2025)", "value": 39.5, "unit": "€/MWh" },
+              { "label": "Winter 25/26", "value": 38.5, "unit": "€/MWh" },
+              { "label": "Summer 26", "value": 33.2, "unit": "€/MWh" },
+              { "label": "Winter 26/27", "value": 34.6, "unit": "€/MWh" },
+              { "label": "Summer 27", "value": 29.4, "unit": "€/MWh" },
+              { "label": "Winter 27/28", "value": 30.8, "unit": "€/MWh" }
+            ],
+            "spot": 33.0
+          },
+          "disclaimer": [
+            "Based on production guidance for 2025 including Tyra.",
+            "Spot prices as of 8 September 2025.",
+            "Hedges include both swaps and options (8 Sep 2025 forward curve)."
+          ]
+        }
+      ]
+    }
+  ]
+}

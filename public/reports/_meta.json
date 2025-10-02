@@ -1,0 +1,26 @@
+{
+  "overrides": {
+    "/reports/2023/q4-results.pdf": {
+      "pub_year": 2024,
+      "pub_date_ISO": "2024-01-31",
+      "kind": "report",
+      "note": "Q4 results"
+    },
+    "/reports/2022/annual-report.pdf": {
+      "pub_year": 2023,
+      "kind": "annual",
+      "note": "Annual Report 2022"
+    },
+    "/reports/2025/2025-07-10-investor-presentation.pdf": {
+      "pub_year": 2025,
+      "pub_date_ISO": "2025-07-10",
+      "kind": "presentation",
+      "note": "Investor presentation (July 2025)"
+    },
+    "/reports/2024/trading-update.pdf": {
+      "pub_year": 2024,
+      "kind": "report",
+      "note": "Trading update"
+    }
+  }
+}
