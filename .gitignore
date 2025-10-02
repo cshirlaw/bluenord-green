@@ -16,3 +16,7 @@ node_modules
 
 **/.DS_Store
 
+
+# Editor files
+.vscode/
+*.code-workspace
