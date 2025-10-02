@@ -7,17 +7,14 @@ const BRAND = {
   text: '#0f172a',
   subtext: '#475569',
   border: '#E5E7EB',
-  chip: '#EEF2F7',
 };
 
-/* ----------------------------- UI bits ----------------------------- */
-function Breadcrumbs({
-  items,
-  className = '',
-}: {
-  items: { href: string; label: string }[];
-  className?: string;
-}) {
+const ASSETS = {
+  logo: '/images/brand/bluenord-logo-260925.png',
+};
+
+/* --------------------------- Breadcrumbs -------------------------- */
+function Breadcrumbs({ items, className = '' }: { items: { href: string; label: string }[]; className?: string }) {
   return (
     <nav aria-label="Breadcrumb" className={`text-xs md:text-sm ${className}`}>
       <ol className="flex flex-wrap items-center gap-1 md:gap-1.5 text-gray-500">
@@ -38,10 +35,10 @@ function Breadcrumbs({
   );
 }
 
-/* ----------------------------- Page ----------------------------- */
+/* ----------------------------- Page ------------------------------ */
 export default function FinancialsPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-10">
       {/* Header breadcrumbs */}
       <Breadcrumbs
         className="mb-4"
@@ -51,93 +48,94 @@ export default function FinancialsPage() {
         ]}
       />
 
-      {/* Heading */}
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold" style={{ color: BRAND.text }}>
-          Financials
-        </h1>
-        <p className="mt-1 text-sm" style={{ color: BRAND.subtext }}>
-          Presentations, results, and interactive briefings. Use the quick links below to jump to what you need.
-        </p>
-      </header>
+      {/* Hero / Brand band */}
+      <div className="overflow-hidden rounded-3xl border shadow-sm" style={{ borderColor: BRAND.border }}>
+        <div
+          className="flex items-center gap-3 px-5 py-4"
+          style={{ background: `linear-gradient(90deg, ${BRAND.primary} 0%, ${BRAND.accent} 100%)`, color: 'white' }}
+        >
+          <img src={ASSETS.logo} alt="BlueNord" className="h-7 w-auto" />
+          <div className="ml-1">
+            <h1 className="text-lg font-semibold">Financials</h1>
+            <p className="text-xs opacity-90">
+              Interactive quarterlies and key investor documents.
+            </p>
+          </div>
+        </div>
+      </div>
 
-      {/* Featured presentation (static card) */}
-      <section
-        className="mb-6 rounded-2xl border p-5 shadow-sm"
-        style={{ borderColor: BRAND.border, background: 'white' }}
-      >
-        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <div
-                className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium"
-                style={{ background: BRAND.chip, color: BRAND.primary }}
-              >
-                Featured
-              </div>
-              <h2 className="truncate text-base font-medium" style={{ color: BRAND.text }}>
-                Pareto Securities Energy Conference (10 Sep 2025)
-              </h2>
+      {/* Interactive briefings */}
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold" style={{ color: BRAND.text }}>Interactive presentations</h2>
+        <p className="mt-1 text-sm" style={{ color: BRAND.subtext }}>
+          Explore live charts and summaries derived from the company presentations.
+        </p>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {/* Q3 2025 */}
+          <Link
+            href="/financials/q3-2025"
+            className="block rounded-2xl border p-5 transition hover:bg-gray-50"
+            style={{ borderColor: BRAND.border }}
+          >
+            <div className="text-sm font-semibold" style={{ color: BRAND.text }}>
+              Q3 2025 presentation (interactive)
             </div>
             <div className="mt-1 text-xs" style={{ color: BRAND.subtext }}>
-              PDF · 10 Sep 2025
+              XLSX → JSON powered page with production & hedge charts.
             </div>
-          </div>
+          </Link>
+
+          {/* Q2 2025 */}
+          <Link
+            href="/financials/q2-2025"
+            className="block rounded-2xl border p-5 transition hover:bg-gray-50"
+            style={{ borderColor: BRAND.border }}
+          >
+            <div className="text-sm font-semibold" style={{ color: BRAND.text }}>
+              Q2 2025 presentation (interactive)
+            </div>
+            <div className="mt-1 text-xs" style={{ color: BRAND.subtext }}>
+              Production outlook and hedge portfolio snapshots.
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* Key documents */}
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold" style={{ color: BRAND.text }}>Key documents</h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {/* Featured PDF (Pareto) */}
           <a
             href="/reports/2025/BlueNord_ASA_Pareto_Securities_Energy_Conference_10_September_2025.pdf"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm shadow-sm transition hover:bg-gray-50"
-            style={{ borderColor: BRAND.border, color: BRAND.primary }}
+            className="block rounded-2xl border p-5 transition hover:bg-gray-50"
+            style={{ borderColor: BRAND.border }}
           >
-            Open PDF
+            <div className="text-sm font-semibold" style={{ color: BRAND.text }}>
+              Pareto Securities Energy Conference (10 Sep 2025) — PDF
+            </div>
+            <div className="mt-1 text-xs" style={{ color: BRAND.subtext }}>
+              Full presentation deck (opens in a new tab).
+            </div>
           </a>
-        </div>
-      </section>
 
-      {/* Interactive briefings */}
-      <section
-        className="mb-6 rounded-2xl border p-5"
-        style={{ borderColor: BRAND.border, background: 'white' }}
-      >
-        <div className="text-sm" style={{ color: BRAND.text }}>
-          <span className="mr-2 font-medium">Interactive briefings:</span>
-          <Link href="/financials/q2-2025" className="underline">
-            Q2 2025 presentation
-          </Link>
-          <span className="mx-2 text-gray-400">·</span>
-          <Link href="/investors/briefings/pareto-2025-09" className="underline">
-            Pareto (Sep 2025)
+          {/* Reports & Results hub */}
+          <Link
+            href="/investors/reports"
+            className="block rounded-2xl border p-5 transition hover:bg-gray-50"
+            style={{ borderColor: BRAND.border }}
+          >
+            <div className="text-sm font-semibold" style={{ color: BRAND.text }}>
+              Reports &amp; Results
+            </div>
+            <div className="mt-1 text-xs" style={{ color: BRAND.subtext }}>
+              Browse annual reports, quarterly results, and investor decks.
+            </div>
           </Link>
         </div>
-        <p className="mt-2 text-xs" style={{ color: BRAND.subtext }}>
-          These pages are updated from simple JSON files so new figures can be published without code changes.
-        </p>
-      </section>
-
-      {/* Quick links */}
-      <section className="grid gap-4 md:grid-cols-2">
-        <Link
-          href="/investors/reports"
-          className="rounded-2xl border p-5 transition hover:bg-gray-50"
-          style={{ borderColor: BRAND.border, background: 'white', color: BRAND.text }}
-        >
-          <div className="text-base font-medium">All Reports &amp; Results</div>
-          <div className="mt-1 text-sm" style={{ color: BRAND.subtext }}>
-            Annual reports, quarterlies, and investor presentations.
-          </div>
-        </Link>
-
-        <Link
-          href="/investors/share"
-          className="rounded-2xl border p-5 transition hover:bg-gray-50"
-          style={{ borderColor: BRAND.border, background: 'white', color: BRAND.text }}
-        >
-          <div className="text-base font-medium">Shares &amp; Debt</div>
-          <div className="mt-1 text-sm" style={{ color: BRAND.subtext }}>
-            Share information and debt overview.
-          </div>
-        </Link>
       </section>
 
       {/* Footer breadcrumbs */}
