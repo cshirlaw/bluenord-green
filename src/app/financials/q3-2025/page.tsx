@@ -8,6 +8,7 @@ import {
   BarChart, Bar,
 } from 'recharts';
 
+/* ----------------------------- Brand ----------------------------- */
 const BRAND = {
   primary: '#0A2A4A',
   accent: '#00A3E0',
@@ -26,6 +27,7 @@ const CHART = {
   },
 };
 
+/* ------------------------------ Types ---------------------------- */
 type ProductionPoint = { month: string; avg: number; peak: number };
 type HedgePoint = { label: string; hedgedVolume?: number; floorPrice?: number };
 type QData = {
@@ -35,6 +37,7 @@ type QData = {
   oilHedge: HedgePoint[];
 };
 
+/* ----------------------- Inline fallback data -------------------- */
 const INLINE_SAMPLE: QData = {
   hero: {
     title: 'Q3 2025 presentation (interactive)',
@@ -55,6 +58,7 @@ const INLINE_SAMPLE: QData = {
   ],
 };
 
+/* --------------------------- UI helpers -------------------------- */
 function Breadcrumbs({ items, className = '' }: { items: { href: string; label: string }[]; className?: string }) {
   return (
     <nav aria-label="Breadcrumb" className={`text-xs md:text-sm ${className}`}>
@@ -95,6 +99,7 @@ function ChartShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ------------------------------ Charts --------------------------- */
 function ProductionChart({ data }: { data: ProductionPoint[] }) {
   const isMobile = useIsMobile();
   return (
@@ -149,12 +154,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+/* ------------------------------ Page ----------------------------- */
 export default function Q3InteractivePage() {
   const [data, setData] = useState<QData | null>(null);
 
   useEffect(() => {
     let alive = true;
-    fetch('/data/financials/q3-2025.json', { cache: 'no-store' })
+    // NOTE: cache-busting token (?v=YYYYMMDD-#) — bump when data changes
+    fetch('/data/financials/q3-2025.json?v=20251002-2', { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => { if (!alive) return; setData(j && j.production ? (j as QData) : INLINE_SAMPLE); })
       .catch(() => setData(INLINE_SAMPLE));
@@ -169,7 +176,14 @@ export default function Q3InteractivePage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-      <Breadcrumbs className="mb-4" items={[{ href: '/', label: 'Home' }, { href: '/financials', label: 'Financials' }, { href: '/financials/q3-2025', label: 'Q3 2025 presentation' }]} />
+      <Breadcrumbs
+        className="mb-4"
+        items={[
+          { href: '/', label: 'Home' },
+          { href: '/financials', label: 'Financials' },
+          { href: '/financials/q3-2025', label: 'Q3 2025 presentation' },
+        ]}
+      />
 
       <div className="overflow-hidden rounded-3xl border shadow-sm" style={{ borderColor: BRAND.border }}>
         <div className="bg-white/80 p-6 md:p-7">
@@ -209,7 +223,14 @@ export default function Q3InteractivePage() {
         </div>
       </Section>
 
-      <Breadcrumbs className="mt-10" items={[{ href: '/', label: 'Home' }, { href: '/financials', label: 'Financials' }, { href: '/financials/q3-2025', label: 'Q3 2025 presentation' }]} />
+      <Breadcrumbs
+        className="mt-10"
+        items={[
+          { href: '/', label: 'Home' },
+          { href: '/financials', label: 'Financials' },
+          { href: '/financials/q3-2025', label: 'Q3 2025 presentation' },
+        ]}
+      />
     </div>
   );
 }
