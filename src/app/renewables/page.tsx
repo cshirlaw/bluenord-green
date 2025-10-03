@@ -22,8 +22,8 @@ export default function Page() {
     <main>
       {/* Hero */}
       <section className="relative overflow-hidden border-b bg-white">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-6 px-4 py-10 md:grid-cols-2">
-          <div className="w-full justify-self-start text-left">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center justify-items-start gap-6 px-4 py-10 md:grid-cols-2">
+          <div className="w-full text-left">
             <h1 className="text-3xl font-bold leading-tight">
               Renewables 2025: Wind & Solar
             </h1>
@@ -41,7 +41,7 @@ export default function Page() {
               </a>
             </div>
           </div>
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border justify-self-stretch">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border md:justify-self-end">
             <Image
               src="/renewables/wind/wind-1.jpg"
               alt="Wind farm hero"
