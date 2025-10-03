@@ -3,30 +3,31 @@ import Link from "next/link";
 
 export const metadata = {
   title: "BlueNord-Green",
-  description: "Demo site showcasing Renewables 2025 alongside the core BlueNord experience.",
+  description:
+    "Demo site showcasing Renewables 2025 alongside the core BlueNord experience.",
 };
 
 export default function Home() {
+  // Four navigation cards on the homepage
   const cards = [
     { href: "/investors", label: "Investors", desc: "Reports and shareholder info" },
-    // REPLACED: { href: "/financials", label: "Financials", desc: "Results and presentations" },
-    { href: "/renewables", label: "Renewables 2025", desc: "Wind & solar KPIs and reports" }, // ← NEW
+    { href: "/renewables", label: "Renewables 2025", desc: "Wind & solar KPIs and reports" },
     { href: "/assets/tyra", label: "Assets", desc: "Tyra, Gorm, Dan, Halfdan" },
-    { href: "/financials", label: "Financials", desc: "Results and presentations" }, // OPTIONAL: keep as a 4th card if you want to *add* instead of *replace*.
+    { href: "/financials", label: "Financials", desc: "Results and presentations" },
   ].slice(0, 4); // keep at 4 cards on home
 
   return (
     <main>
       {/* HERO */}
       <section className="relative border-b bg-white">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 py-10 md:grid-cols-2">
-          <div>
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-6 px-4 py-10 md:grid-cols-2">
+          <div className="w-full justify-self-start">
             <h1 className="text-3xl font-bold leading-tight">
               BlueNord-Green: Renewables 2025
             </h1>
             <p className="mt-3 text-neutral-700">
-              A live demonstration of how BlueNord could present wind & solar alongside its core operations:
-              credible KPIs, investor-grade reports, and strong visuals.
+              A live demonstration of how BlueNord could present wind &amp; solar alongside its
+              core operations: credible KPIs, investor-grade reports, and strong visuals.
             </p>
             <div className="mt-5 flex gap-3">
               <Link
@@ -47,7 +48,7 @@ export default function Home() {
           {/* New hero image */}
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border">
             <Image
-              src="/home/green-hero.jpg" // ← your new photo
+              src="/home/green-hero.jpg" // ensure file exists at public/home/green-hero.jpg
               alt="Wind turbines and solar array representing BlueNord-Green"
               fill
               className="object-cover"

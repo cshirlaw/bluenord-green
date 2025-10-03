@@ -4,7 +4,8 @@ import RenewablesReportsClient from "@/components/RenewablesReportsClient";
 
 export const metadata = {
   title: "Renewables 2025 | BlueNord-Green",
-  description: "BlueNord-Green demonstration: Renewables 2025 hub with KPIs, images, and reports.",
+  description:
+    "BlueNord-Green demonstration: Renewables 2025 hub with KPIs, images, and reports.",
 };
 
 const gallery = [
@@ -21,15 +22,16 @@ export default function Page() {
     <main>
       {/* Hero */}
       <section className="relative overflow-hidden border-b bg-white">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 py-10 md:grid-cols-2">
-          <div>
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-6 px-4 py-10 md:grid-cols-2">
+          <div className="w-full justify-self-start text-left">
             <h1 className="text-3xl font-bold leading-tight">
-  Renewables 2025: Wind & Solar
-</h1>
-<p className="mt-3 text-neutral-600">
-  A forward-looking demonstration of how BlueNord could present its energy transition journey 
-  in 2025 — with KPIs, investable reports, and strong visuals.
-</p>
+              Renewables 2025: Wind & Solar
+            </h1>
+            <p className="mt-3 text-neutral-600">
+              A forward-looking demonstration of how BlueNord could present its
+              energy transition journey in 2025 — with KPIs, investable reports,
+              and strong visuals.
+            </p>
             <div className="mt-5">
               <a
                 href="#reports"
@@ -39,7 +41,7 @@ export default function Page() {
               </a>
             </div>
           </div>
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border justify-self-stretch">
             <Image
               src="/renewables/wind/wind-1.jpg"
               alt="Wind farm hero"
@@ -60,7 +62,10 @@ export default function Page() {
         <h2 className="mb-4 text-2xl font-semibold text-green-600">Gallery</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {gallery.map((img) => (
-            <div key={img.src} className="relative aspect-[4/3] overflow-hidden rounded-2xl border">
+            <div
+              key={img.src}
+              className="relative aspect-[4/3] overflow-hidden rounded-2xl border"
+            >
               <Image
                 src={img.src}
                 alt={img.alt}
@@ -83,9 +88,10 @@ export default function Page() {
         <div className="rounded-2xl border bg-white p-6">
           <h3 className="text-xl font-semibold text-green-600">Vision</h3>
           <p className="mt-2 text-neutral-700">
-            BlueNord’s offshore expertise, capital discipline, and project delivery capability
-            can extend naturally into wind and solar. This investor-facing demo illustrates how
-            an energy transition narrative can be communicated with substance and clarity.
+            BlueNord’s offshore expertise, capital discipline, and project
+            delivery capability can extend naturally into wind and solar. This
+            investor-facing demo illustrates how an energy transition narrative
+            can be communicated with substance and clarity.
           </p>
         </div>
       </section>
