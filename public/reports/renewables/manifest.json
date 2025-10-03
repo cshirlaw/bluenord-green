@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "title": "Energy Transition Strategy 2025",
+      "href": "/reports/renewables/2025/bluenord-energy-transition-strategy-2025.pdf",
+      "year": 2025,
+      "sizeKB": 820,
+      "tags": ["strategy", "transition"]
+    },
+    {
+      "title": "Net Zero Pathway — Overview",
+      "href": "/reports/renewables/2025/net-zero-pathway-overview.pdf",
+      "year": 2025,
+      "sizeKB": 540,
+      "tags": ["net-zero", "targets"]
+    },
+    {
+      "title": "Renewables Investment Outline",
+      "href": "/reports/renewables/2025/renewables-investment-outline.pdf",
+      "year": 2025,
+      "sizeKB": 660,
+      "tags": ["capex", "wind", "solar"]
+    }
+  ]
+}
