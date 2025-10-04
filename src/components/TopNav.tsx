@@ -10,13 +10,12 @@ type NavItem = { href: string; label: string };
 export default function TopNav() {
   const pathname = usePathname();
 
-  // Minimal, mirrored set for Green
   const nav: NavItem[] = useMemo(
     () => [
-      { href: "/renewables", label: "Renewables 2025" }, // ← now first
+      { href: "/renewables", label: "Renewables 2025" }, // first
       { href: "/investors", label: "Investors" },
       { href: "/financials", label: "Financials" },
-     { href: "/assets/tyra", label: "Assets" },
+      { href: "/assets/tyra", label: "Assets" },
     ],
     []
   );
@@ -26,20 +25,35 @@ export default function TopNav() {
 
   return (
     <header className="border-b bg-white">
-      <div className="mx-auto flex h-12 max-w-6xl items-center gap-4 px-4">
-        {/* Home label per Green convention */}
-        <Link href="/" className="text-sm font-semibold">  {/* remove shrink-0 to allow wrap */}
-          HomeGreen
-        </Link>
+      {/* Mobile: stack; Desktop: align horizontally */}
+      <div className="mx-auto max-w-6xl px-4 py-2 md:flex md:h-12 md:items-center md:justify-between md:py-0">
+        {/* Row 1: Brand/home */}
+        <div className="text-sm font-semibold">HomeGreen</div>
 
-         {/* allow wrap on small screens so nothing overflows */}
-         <nav className="flex flex-wrap items-center gap-2 md:gap-4 min-w-0">
+        {/* Row 2: Scrollable pill nav on mobile, inline on desktop */}
+        <nav
+          className="
+            mt-2 flex gap-2 overflow-x-auto whitespace-nowrap md:mt-0 md:gap-4
+            -mx-4 px-4 md:mx-0 md:px-0
+          "
+          style={{
+            scrollbarWidth: "none",        // Firefox
+            msOverflowStyle: "none",       // IE/Edge
+          }}
+        >
+          {/* Hide webkit scrollbar */}
+          <style jsx>{`
+            nav::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
+
           {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={[
-                "rounded-md px-3 py-1.5 text-sm transition",
+                "inline-flex shrink-0 items-center rounded-md px-3 py-1.5 text-sm transition",
                 isActive(item.href)
                   ? "bg-green-600 text-white"
                   : "text-neutral-700 hover:bg-neutral-100",
