@@ -10,8 +10,8 @@ export const metadata = {
 export default function Home() {
   // Four navigation cards on the homepage
   const cards = [
-    { href: "/investors", label: "Investors", desc: "Reports and shareholder info" },
     { href: "/renewables", label: "Renewables 2025", desc: "Wind & solar KPIs and reports" },
+    { href: "/investors", label: "Investors", desc: "Reports and shareholder info" },
     { href: "/assets/tyra", label: "Assets", desc: "Tyra, Gorm, Dan, Halfdan" },
     { href: "/financials", label: "Financials", desc: "Results and presentations" },
   ].slice(0, 4); // keep at 4 cards on home

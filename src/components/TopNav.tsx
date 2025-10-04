@@ -13,10 +13,10 @@ export default function TopNav() {
   // Minimal, mirrored set for Green
   const nav: NavItem[] = useMemo(
     () => [
+      { href: "/renewables", label: "Renewables 2025" }, // ← now first
       { href: "/investors", label: "Investors" },
       { href: "/financials", label: "Financials" },
-      { href: "/assets/tyra", label: "Assets" },
-      { href: "/renewables", label: "Renewables 2025" }, // ← added
+     { href: "/assets/tyra", label: "Assets" },
     ],
     []
   );
@@ -26,13 +26,14 @@ export default function TopNav() {
 
   return (
     <header className="border-b bg-white">
-      <div className="mx-auto flex h-12 max-w-6xl items-center gap-6 px-4">
+      <div className="mx-auto flex h-12 max-w-6xl items-center gap-4 px-4">
         {/* Home label per Green convention */}
-        <Link href="/" className="shrink-0 text-sm font-semibold">
+        <Link href="/" className="text-sm font-semibold">  {/* remove shrink-0 to allow wrap */}
           HomeGreen
         </Link>
 
-        <nav className="flex items-center gap-4">
+         {/* allow wrap on small screens so nothing overflows */}
+         <nav className="flex flex-wrap items-center gap-2 md:gap-4 min-w-0">
           {nav.map((item) => (
             <Link
               key={item.href}
